@@ -111,3 +111,57 @@ save_ggplot = function(p,f,h=150,w=150,format="png-pdf"){
     )
   }
 }
+
+add_climate_emulator_col <- function(df) {
+
+  # function could be made smarter with a more flexible filtering mechanism
+  # currently assumes all columns to be entirely lower cap
+
+  df <- df %>%
+    mutate(
+      emulator =
+        ifelse(
+          grepl(
+            x = variable, pattern = "CICERO-SCM", fixed = T
+          ),
+          "CICERO",
+          ifelse(
+            grepl(
+              x = variable, pattern = "MAGICCv7.5.3", fixed = T
+            ),
+            "MAGICC",
+            ifelse(
+              grepl(
+                x = variable, pattern = "FaIRv1.6.2", fixed = T
+              ),
+              "FaIR",
+              NA
+            )
+          )
+        )
+    ) %>%
+    mutate(
+      variable =
+        ifelse(
+          grepl(
+            x = variable, pattern = "CICERO-SCM", fixed = T
+          ),
+          str_remove(string = variable, pattern = "CICERO-SCM\\|"),
+          ifelse(
+            grepl(
+              x = variable, pattern = "MAGICCv7.5.3", fixed = T
+            ),
+            str_remove(string = variable, pattern = "MAGICCv7.5.3\\|"),
+            ifelse(
+              grepl(
+                x = variable, pattern = "FaIRv1.6.2", fixed = T
+              ),
+              str_remove(string = variable, pattern = "FaIRv1.6.2\\|"),
+              variable
+            )
+          )
+        )
+    )
+
+  return(df)
+}
